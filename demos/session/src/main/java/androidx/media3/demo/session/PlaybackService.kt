@@ -21,16 +21,13 @@ import android.app.TaskStackBuilder
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import androidx.media3.common.AudioAttributes
-import androidx.media3.common.MediaItem
+import android.util.Log
+import androidx.media3.common.*
 import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.session.CommandButton
-import androidx.media3.session.LibraryResult
-import androidx.media3.session.MediaLibraryService
-import androidx.media3.session.MediaSession
+import androidx.media3.extractor.metadata.icy.IcyHeaders
+import androidx.media3.extractor.metadata.icy.IcyInfo
+import androidx.media3.session.*
 import androidx.media3.session.MediaSession.ControllerInfo
-import androidx.media3.session.SessionCommand
-import androidx.media3.session.SessionResult
 import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
@@ -217,6 +214,9 @@ class PlaybackService : MediaLibraryService() {
         .build()
     MediaItemTree.initialize(assets)
 
+    // Testing Issue #153
+    player.addListener(playerListener)
+
     val sessionActivityPendingIntent =
       TaskStackBuilder.create(this).run {
         addNextIntent(Intent(this@PlaybackService, MainActivity::class.java))
@@ -253,4 +253,32 @@ class PlaybackService : MediaLibraryService() {
   private fun ignoreFuture(customLayout: ListenableFuture<SessionResult>) {
     /* Do nothing. */
   }
+
+
+  // Testing Issue #153
+  private val playerListener: Player.Listener = object : Player.Listener {
+    override fun onMetadata(metadata: Metadata) {
+      for (i in 0 until metadata.length()) {
+        val entry = metadata[i]
+        if (entry is IcyInfo) {
+          Log.d("Issue #153", "IcyInfo title = ${entry.title}")
+        } else if (entry is IcyHeaders) {
+          Log.d("Issue #153", "IcyHeaders name = ${entry.name.toString()} genre = ${entry.genre}")
+        } else {
+          Log.d("Issue #153",  "Other metadata type received. (type = ${entry.javaClass.simpleName})")
+        }
+      }
+      super.onMetadata(metadata)
+    }
+
+    override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
+      super.onMediaMetadataChanged(mediaMetadata)
+      Log.d("Issue #153", "MediaMetadata title = ${mediaMetadata.title}")
+      Log.d("Issue #153", "MediaMetadata station = ${mediaMetadata.station}")
+      Log.d("Issue #153", "MediaMetadata genre = ${mediaMetadata.genre}")
+    }
+  }
+
+
+
 }

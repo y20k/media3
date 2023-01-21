@@ -1,6 +1,20 @@
 {
   "media": [
     {
+      "id": "wnyc_test",
+      "title": "WNYC Live Radio",
+      "album": "Radio Stations",
+      "artist": "WNYC",
+      "genre": "Radio",
+      "source": "https://fm939.wnyc.org/wnycfm.aac",
+      "image": "https://media.wnyc.org/i/500/500/c/80/1/wnyc_2_1.png",
+      "trackNumber": 1,
+      "totalTrackCount": 1,
+      "duration": 160,
+      "site": "https://www.wnyc.org/"
+    },
+
+    {
       "id": "video_01",
       "title": "Future Scenario",
       "album": "Mango Open Movie project",
